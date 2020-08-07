@@ -1,4 +1,4 @@
-package board
+package hakoiri
 
 import (
 	"strings"
@@ -44,6 +44,38 @@ const (
 	PanelTea
 	PanelEmpty
 )
+
+// サイズのみでpanelの種類を区別せずに盤面をhash化する際に利用するmap
+var sizeTypeMap = map[Panel]string{
+	PanelGirlTopLeft:       "A1",
+	PanelGirlTopRight:      "A2",
+	PanelGirlBottomLeft:    "A3",
+	PanelGirlBottomRight:   "A4",
+	PanelFatherTop:         "B1",
+	PanelFatherBottom:      "B2",
+	PanelMotherTop:         "B1",
+	PanelMotherBottom:      "B2",
+	PanelGrandFatherTop:    "B1",
+	PanelGrandFatherBottom: "B2",
+	PanelGrandMotherTop:    "B1",
+	PanelGrandMotherBottom: "B2",
+	PanelBrotherLeft:       "C1",
+	PanelBrotherRight:      "C2",
+	PanelKoto:              "D1",
+	PanelFlower:            "D1",
+	PanelCalligraphy:       "D1",
+	PanelTea:               "D1",
+	PanelEmpty:             "E1",
+}
+
+// DefaultPanels is standard initial panels
+var DefaultPanels = [Height][Width]Panel{
+	{PanelFatherTop, PanelGirlTopLeft, PanelGirlTopRight, PanelMotherTop},
+	{PanelFatherBottom, PanelGirlBottomLeft, PanelGirlBottomRight, PanelMotherBottom},
+	{PanelGrandFatherTop, PanelBrotherLeft, PanelBrotherRight, PanelGrandMotherTop},
+	{PanelGrandFatherBottom, PanelFlower, PanelCalligraphy, PanelGrandMotherBottom},
+	{PanelKoto, PanelEmpty, PanelEmpty, PanelTea},
+}
 
 // PanelStringMap is a map for Panel to string
 var PanelStringMap = map[Panel][]string{
@@ -147,6 +179,8 @@ var PanelStringMap = map[Panel][]string{
 // Board is state of hakoiri puzzle
 type Board struct {
 	Panels [Height][Width]Panel
+	Turn   int
+	Prev   *Board
 }
 
 // ToString returns board state as string
@@ -166,4 +200,23 @@ func (b *Board) ToString() string {
 		lines[i] = strings.Join(strBoard[i][:], "")
 	}
 	return strings.Join(lines[:], "\n")
+}
+
+// ToHash returns string hash of board's panels
+func (b *Board) ToHash() string {
+	lines := [Height]string{}
+	for i := 0; i < Height; i++ {
+		line := [Width]string{}
+		for j := 0; j < Width; j++ {
+			line[j] = sizeTypeMap[b.Panels[i][j]]
+		}
+		lines[i] = strings.Join(line[:], "")
+	}
+	return strings.Join(lines[:], "")
+}
+
+// IsGoal returns true if GirlPanel can go out
+func (b *Board) IsGoal() bool {
+	p := b.Panels
+	return p[3][1] == PanelGirlTopLeft
 }
