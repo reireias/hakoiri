@@ -103,6 +103,8 @@ func TestNext1x2(t *testing.T) {
 	p = deepCopy(DefaultPanels)
 	p[3][1] = PanelEmpty
 	p[3][2] = PanelEmpty
+	p[4][1] = PanelFlower
+	p[4][2] = PanelCalligraphy
 	b = Board{Panels: p}
 	boards = next(b, 2, 1, false)
 	if len(boards) != 1 {
@@ -130,7 +132,7 @@ func TestMove(t *testing.T) {
 	p := deepCopy(DefaultPanels)
 
 	// 0, 1の座標に左上がある2x2のPanelを左へ移動
-	moved := moveLeft(p, 0, 1, 2, 2)
+	moved := move(p, 0, 1, Left)
 
 	if moved[0][0] != p[0][1] ||
 		moved[0][1] != p[0][2] ||
@@ -142,7 +144,7 @@ func TestMove(t *testing.T) {
 	}
 
 	// 戻す
-	moved = moveRight(moved, 0, 0, 2, 2)
+	moved = move(moved, 0, 0, Right)
 	if moved[0][0] != p[0][0] ||
 		moved[1][1] != p[1][1] {
 		t.Fail()

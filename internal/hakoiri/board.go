@@ -19,6 +19,20 @@ const StringHeight = Height * PanelHeight
 // StringWidth is runes of line in a board
 const StringWidth = 4
 
+// Direction is panel move direction
+type Direction int
+
+// directions
+const (
+	Left Direction = iota
+	Right
+	Top
+	Bottom
+)
+
+// Directions is all values of Direction
+var Directions = []Direction{Left, Right, Top, Bottom}
+
 // Panel shows panel type in board
 type Panel int
 
@@ -44,6 +58,117 @@ const (
 	PanelTea
 	PanelEmpty
 )
+
+var sizeMap = map[Panel]string{
+	PanelGirlTopLeft:    "2x2",
+	PanelFatherTop:      "2x1",
+	PanelMotherTop:      "2x1",
+	PanelGrandFatherTop: "2x1",
+	PanelGrandMotherTop: "2x1",
+	PanelBrotherLeft:    "1x2",
+	PanelKoto:           "1x1",
+	PanelFlower:         "1x1",
+	PanelCalligraphy:    "1x1",
+	PanelTea:            "1x1",
+}
+
+type key struct {
+	direction Direction
+	size      string
+}
+
+type delta struct {
+	height int
+	width  int
+}
+
+// 移動させる際にEmptyかをチェックすべき位置を相対値で表すmap
+var moveCheckMap = map[key][]delta{
+	{direction: Left, size: "2x2"}:   {delta{height: 0, width: -1}, delta{height: 1, width: -1}},
+	{direction: Right, size: "2x2"}:  {delta{height: 0, width: 2}, delta{height: 1, width: 2}},
+	{direction: Top, size: "2x2"}:    {delta{height: -1, width: 0}, delta{height: -1, width: 1}},
+	{direction: Bottom, size: "2x2"}: {delta{height: 2, width: 0}, delta{height: 2, width: 1}},
+	{direction: Left, size: "2x1"}:   {delta{height: 0, width: -1}, delta{height: 1, width: -1}},
+	{direction: Right, size: "2x1"}:  {delta{height: 0, width: 1}, delta{height: 1, width: 1}},
+	{direction: Top, size: "2x1"}:    {delta{height: -1, width: 0}},
+	{direction: Bottom, size: "2x1"}: {delta{height: 2, width: 0}},
+	{direction: Left, size: "1x2"}:   {delta{height: 0, width: -1}},
+	{direction: Right, size: "1x2"}:  {delta{height: 0, width: 2}},
+	{direction: Top, size: "1x2"}:    {delta{height: -1, width: 0}, delta{height: -1, width: 1}},
+	{direction: Bottom, size: "1x2"}: {delta{height: 1, width: 0}, delta{height: 1, width: 1}},
+	{direction: Left, size: "1x1"}:   {delta{height: 0, width: -1}},
+	{direction: Right, size: "1x1"}:  {delta{height: 0, width: 1}},
+	{direction: Top, size: "1x1"}:    {delta{height: -1, width: 0}},
+	{direction: Bottom, size: "1x1"}: {delta{height: 1, width: 0}},
+}
+
+type swapDelta struct {
+	h1, w1, h2, w2 int
+}
+
+// サイズと移動方向をkey、swapすべき座標のリストをvalueにもつmap
+var moveSwapMap = map[key][]swapDelta{
+	{direction: Left, size: "2x2"}: {
+		swapDelta{h1: 0, w1: -1, h2: 0, w2: 0},
+		swapDelta{h1: 0, w1: 0, h2: 0, w2: 1},
+		swapDelta{h1: 1, w1: -1, h2: 1, w2: 0},
+		swapDelta{h1: 1, w1: 0, h2: 1, w2: 1},
+	},
+	{direction: Right, size: "2x2"}: {
+		swapDelta{h1: 0, w1: 2, h2: 0, w2: 1},
+		swapDelta{h1: 0, w1: 1, h2: 0, w2: 0},
+		swapDelta{h1: 1, w1: 2, h2: 1, w2: 1},
+		swapDelta{h1: 1, w1: 1, h2: 1, w2: 0},
+	},
+	{direction: Top, size: "2x2"}: {
+		swapDelta{h1: -1, w1: 0, h2: 0, w2: 0},
+		swapDelta{h1: 0, w1: 0, h2: 1, w2: 0},
+		swapDelta{h1: -1, w1: 1, h2: 0, w2: 1},
+		swapDelta{h1: 0, w1: 1, h2: 1, w2: 1},
+	},
+	{direction: Bottom, size: "2x2"}: {
+		swapDelta{h1: 2, w1: 0, h2: 1, w2: 0},
+		swapDelta{h1: 1, w1: 0, h2: 0, w2: 0},
+		swapDelta{h1: 2, w1: 1, h2: 1, w2: 1},
+		swapDelta{h1: 1, w1: 1, h2: 0, w2: 1},
+	},
+	{direction: Left, size: "2x1"}: {
+		swapDelta{h1: 0, w1: -1, h2: 0, w2: 0},
+		swapDelta{h1: 1, w1: -1, h2: 1, w2: 0},
+	},
+	{direction: Right, size: "2x1"}: {
+		swapDelta{h1: 0, w1: 0, h2: 0, w2: 1},
+		swapDelta{h1: 1, w1: 0, h2: 1, w2: 1},
+	},
+	{direction: Top, size: "2x1"}: {
+		swapDelta{h1: -1, w1: 0, h2: 0, w2: 0},
+		swapDelta{h1: 0, w1: 0, h2: 1, w2: 0},
+	},
+	{direction: Bottom, size: "2x1"}: {
+		swapDelta{h1: 2, w1: 0, h2: 1, w2: 0},
+		swapDelta{h1: 1, w1: 0, h2: 0, w2: 0},
+	},
+	{direction: Left, size: "1x2"}: {
+		swapDelta{h1: 0, w1: -1, h2: 0, w2: 0},
+		swapDelta{h1: 0, w1: 0, h2: 0, w2: 1},
+	},
+	{direction: Right, size: "1x2"}: {
+		swapDelta{h1: 0, w1: 2, h2: 0, w2: 1},
+		swapDelta{h1: 0, w1: 1, h2: 0, w2: 0},
+	},
+	{direction: Top, size: "1x2"}: {
+		swapDelta{h1: -1, w1: 0, h2: 0, w2: 0},
+		swapDelta{h1: -1, w1: 1, h2: 0, w2: 1},
+	},
+	{direction: Bottom, size: "1x2"}: {
+		swapDelta{h1: 0, w1: 0, h2: 1, w2: 0},
+		swapDelta{h1: 0, w1: 1, h2: 1, w2: 1},
+	},
+	{direction: Left, size: "1x1"}:   {swapDelta{h1: 0, w1: 0, h2: 0, w2: -1}},
+	{direction: Right, size: "1x1"}:  {swapDelta{h1: 0, w1: 0, h2: 0, w2: 1}},
+	{direction: Top, size: "1x1"}:    {swapDelta{h1: 0, w1: 0, h2: -1, w2: 0}},
+	{direction: Bottom, size: "1x1"}: {swapDelta{h1: 0, w1: 0, h2: 1, w2: 0}},
+}
 
 // サイズのみでpanelの種類を区別せずに盤面をhash化する際に利用するmap
 var sizeTypeMap = map[Panel]string{
