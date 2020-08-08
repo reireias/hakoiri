@@ -1,7 +1,7 @@
 package hakoiri
 
 // Solve returns Board list
-func Solve(initBoard Board) Board {
+func Solve(initBoard Board) []Board {
 	pastBoards := make(map[string]struct{})
 
 	// board queue for check next
@@ -16,7 +16,7 @@ func Solve(initBoard Board) Board {
 			b.Prev = &currentBoard
 
 			if b.IsGoal() {
-				return b
+				return makeResult(&b)
 			}
 			h := b.ToHash()
 			if _, ok := pastBoards[h]; !ok {
@@ -58,7 +58,12 @@ func next(b Board, h int, w int, extra bool) []Board {
 		}
 		if isEmpty(p, checks...) {
 			movedP := move(p, h, w, direction)
-			result = append(result, Board{Panels: movedP})
+			result = append(result, Board{
+				Panels:         movedP,
+				MovedDirection: direction,
+				MovedHeight:    h,
+				MovedWidth:     w,
+			})
 			if !extra {
 				moveDelta := moveCheckMap[key{direction: direction, size: "1x1"}][0]
 				extras := next(Board{Panels: movedP}, h+moveDelta.height, w+moveDelta.width, true)
@@ -114,4 +119,15 @@ func swap(p *[Height][Width]Panel, h1, w1, h2, w2 int) {
 	tmp := p[h1][w1]
 	p[h1][w1] = p[h2][w2]
 	p[h2][w2] = tmp
+}
+
+func makeResult(b *Board) []Board {
+	result := make([]Board, b.Turn+1)
+
+	current := b
+	for i := 0; i < b.Turn+1; i++ {
+		result[b.Turn-i] = *current
+		current = current.Prev
+	}
+	return result
 }

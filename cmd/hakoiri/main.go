@@ -32,7 +32,10 @@ const p1 = `+----+
 +----+`
 
 func main() {
-	hakoiri.Solve(hakoiri.Board{Panels: hakoiri.DefaultPanels})
+	result := hakoiri.Solve(hakoiri.Board{Panels: hakoiri.DefaultPanels})
+	for _, b := range result {
+		fmt.Println(b.ToString())
+	}
 	return
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {

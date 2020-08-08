@@ -6,8 +6,8 @@ import (
 
 func TestSolve(t *testing.T) {
 	b := Board{Panels: deepCopy(DefaultPanels), Turn: 0, Prev: nil}
-	goal := Solve(b)
-	if goal.Turn != 81 {
+	result := Solve(b)
+	if len(result) != 82 {
 		t.Fail()
 	}
 }

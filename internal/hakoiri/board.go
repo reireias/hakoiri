@@ -303,9 +303,12 @@ var PanelStringMap = map[Panel][]string{
 
 // Board is state of hakoiri puzzle
 type Board struct {
-	Panels [Height][Width]Panel
-	Turn   int
-	Prev   *Board
+	Panels         [Height][Width]Panel
+	Turn           int
+	Prev           *Board
+	MovedDirection Direction
+	MovedHeight    int
+	MovedWidth     int
 }
 
 // ToString returns board state as string
