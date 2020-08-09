@@ -1,3 +1,5 @@
+![main](https://github.com/reireias/hakoiri/workflows/main/badge.svg)
+
 # hakoiri
 [Klotsuki](https://en.wikipedia.org/wiki/Klotski) puzzle solver.
 
