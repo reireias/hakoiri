@@ -13,11 +13,11 @@ const Width = 4
 // PanelHeight is lines in a panel
 const PanelHeight = 3
 
+// PanelWidth is runes in panel one line
+const PanelWidth = 7
+
 // StringHeight is lines in a board
 const StringHeight = Height * PanelHeight
-
-// StringWidth is runes of line in a board
-const StringWidth = 4
 
 // Direction is panel move direction
 type Direction int
@@ -313,7 +313,7 @@ type Board struct {
 
 // ToString returns board state as string
 func (b *Board) ToString() string {
-	strBoard := [StringHeight][StringWidth]string{}
+	strBoard := [StringHeight][Width]string{}
 	for i := 0; i < Height; i++ {
 		for j := 0; j < Width; j++ {
 			panel := b.Panels[i][j]
