@@ -29,6 +29,7 @@ func Start() {
 const puzzleViewWidth = 29
 const puzzleViewHeight = 17
 const headerHeight = 2
+const helpHeight = 2
 
 func initialize() *gocui.Gui {
 	state.result = hakoiri.Solve(hakoiri.Board{Panels: hakoiri.DefaultPanels})
@@ -97,6 +98,22 @@ func layout(g *gocui.Gui) error {
 		headerView.Frame = false
 		fmt.Fprintln(headerView, "Turn: 0")
 	}
+
+	helpView, err := g.SetView(
+		"help",
+		(maxX-puzzleViewWidth)/2,
+		(maxY+puzzleViewHeight)/2+1,
+		(maxX+puzzleViewWidth)/2,
+		(maxY+puzzleViewHeight)/2+1+helpHeight,
+	)
+	if err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		helpView.Frame = false
+		fmt.Fprintln(helpView, "n: next, p: prev, q: quit")
+	}
+
 	return nil
 }
 
