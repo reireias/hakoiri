@@ -74,6 +74,7 @@ var sizeMap = map[Panel]string{
 	PanelTea:            "1x1",
 }
 
+// ConnectedPanelMap value is the slice of the panel connected to key panel.
 var ConnectedPanelMap = map[Panel][]Panel{
 	PanelGirlTopLeft:    {PanelGirlTopLeft, PanelGirlTopRight, PanelGirlBottomLeft, PanelGirlBottomRight},
 	PanelFatherTop:      {PanelFatherTop, PanelFatherBottom},
@@ -97,7 +98,7 @@ type delta struct {
 	width  int
 }
 
-// 移動させる際にEmptyかをチェックすべき位置を相対値で表すmap
+// A map that represents the position to check if it is empty when moving it with a relative value.
 var moveCheckMap = map[key][]delta{
 	{direction: Left, size: "2x2"}:   {delta{height: 0, width: -1}, delta{height: 1, width: -1}},
 	{direction: Right, size: "2x2"}:  {delta{height: 0, width: 2}, delta{height: 1, width: 2}},
@@ -121,7 +122,8 @@ type swapDelta struct {
 	h1, w1, h2, w2 int
 }
 
-// サイズと移動方向をkey、swapすべき座標のリストをvalueにもつmap
+// key: size and direction
+// value: slice of coordinates to swap
 var moveSwapMap = map[key][]swapDelta{
 	{direction: Left, size: "2x2"}: {
 		swapDelta{h1: 0, w1: -1, h2: 0, w2: 0},
@@ -185,7 +187,7 @@ var moveSwapMap = map[key][]swapDelta{
 	{direction: Bottom, size: "1x1"}: {swapDelta{h1: 0, w1: 0, h2: 1, w2: 0}},
 }
 
-// サイズのみでpanelの種類を区別せずに盤面をhash化する際に利用するmap
+// A map used when hashing the panels without distinguishing the type of panel only by size.
 var sizeTypeMap = map[Panel]string{
 	PanelGirlTopLeft:       "A1",
 	PanelGirlTopRight:      "A2",

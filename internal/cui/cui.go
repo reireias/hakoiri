@@ -142,8 +142,8 @@ func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
 }
 
-// gocuiが利用しているtcellは全角文字でも半角サイズとして扱う
-// そのため、全角文字の場合は、後ろにスペースを挿入する
+// tcell used by gocui is treated as a half-size character even with double-byte characters.
+// Therefore, insert a space after double-byte characters.
 func toViewString(s string) string {
 	result := []string{}
 	for _, c := range s {

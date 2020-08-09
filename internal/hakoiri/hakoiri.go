@@ -27,9 +27,10 @@ func Solve(initBoard Board) []Board {
 	}
 }
 
-// アルゴリズム
-// 左上から順にPanelを1枚ずつ走査する。
-// Empty Panelに隣接しているかチェックし、その後1手で動かせる次の状態を算出する。
+// Algorithm
+// 1. Scan panels from the upper left.
+// 2. Check if Empty Panel is nearby.
+// 3. Calculate the next state.
 func nextBoards(b Board) []Board {
 	result := []Board{}
 	for h := 0; h < Height; h++ {
