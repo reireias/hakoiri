@@ -129,7 +129,9 @@ func prev(g *gocui.Gui, v *gocui.View) error {
 func update(g *gocui.Gui, turn int) {
 	puzzleView, _ := g.View("puzzle")
 	puzzleView.Clear()
-	fmt.Fprintln(puzzleView, toViewString(state.result[turn].ToString()))
+	b := state.result[turn]
+	str := b.ToString(hakoiri.ConnectedPanelMap[b.Moved]...)
+	fmt.Fprintln(puzzleView, toViewString(str))
 
 	headerView, _ := g.View("header")
 	headerView.Clear()

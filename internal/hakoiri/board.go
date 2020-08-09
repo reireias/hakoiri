@@ -2,6 +2,8 @@ package hakoiri
 
 import (
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 // Height is board panel height
@@ -70,6 +72,19 @@ var sizeMap = map[Panel]string{
 	PanelFlower:         "1x1",
 	PanelCalligraphy:    "1x1",
 	PanelTea:            "1x1",
+}
+
+var ConnectedPanelMap = map[Panel][]Panel{
+	PanelGirlTopLeft:    {PanelGirlTopLeft, PanelGirlTopRight, PanelGirlBottomLeft, PanelGirlBottomRight},
+	PanelFatherTop:      {PanelFatherTop, PanelFatherBottom},
+	PanelMotherTop:      {PanelMotherTop, PanelMotherBottom},
+	PanelGrandFatherTop: {PanelGrandFatherTop, PanelGrandFatherBottom},
+	PanelGrandMotherTop: {PanelGrandMotherTop, PanelGrandMotherBottom},
+	PanelBrotherLeft:    {PanelBrotherLeft, PanelBrotherRight},
+	PanelKoto:           {PanelKoto},
+	PanelFlower:         {PanelFlower},
+	PanelCalligraphy:    {PanelCalligraphy},
+	PanelTea:            {PanelTea},
 }
 
 type key struct {
@@ -303,22 +318,29 @@ var PanelStringMap = map[Panel][]string{
 
 // Board is state of hakoiri puzzle
 type Board struct {
-	Panels         [Height][Width]Panel
-	Turn           int
-	Prev           *Board
-	MovedDirection Direction
-	MovedHeight    int
-	MovedWidth     int
+	Panels [Height][Width]Panel
+	Turn   int
+	Prev   *Board
+	Moved  Panel
 }
 
 // ToString returns board state as string
-func (b *Board) ToString() string {
+func (b *Board) ToString(highlights ...Panel) string {
+	highlightsMap := map[Panel]struct{}{}
+	for _, h := range highlights {
+		highlightsMap[h] = struct{}{}
+	}
+	red := color.New(color.FgRed).SprintFunc()
 	strBoard := [StringHeight][Width]string{}
 	for i := 0; i < Height; i++ {
 		for j := 0; j < Width; j++ {
 			panel := b.Panels[i][j]
 			for k := 0; k < PanelHeight; k++ {
-				strBoard[i*3+k][j] = PanelStringMap[panel][k]
+				str := PanelStringMap[panel][k]
+				if _, ok := highlightsMap[panel]; ok {
+					str = red(str)
+				}
+				strBoard[i*3+k][j] = str
 			}
 		}
 	}

@@ -59,10 +59,8 @@ func next(b Board, h int, w int, extra bool) []Board {
 		if isEmpty(p, checks...) {
 			movedP := move(p, h, w, direction)
 			result = append(result, Board{
-				Panels:         movedP,
-				MovedDirection: direction,
-				MovedHeight:    h,
-				MovedWidth:     w,
+				Panels: movedP,
+				Moved:  p[h][w],
 			})
 			if !extra {
 				moveDelta := moveCheckMap[key{direction: direction, size: "1x1"}][0]
